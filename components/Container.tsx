@@ -8,7 +8,9 @@ interface ContainerProps {
   style?: ViewStyle;
   paddingHorizontal?: number;
   paddingVertical?: number;
-  variant?: keyof typeof import("@/constants/Colors").default.light.scheme_colors;
+  variant?:
+    | keyof typeof import("@/constants/Colors").default.light.scheme_colors
+    | "default";
 }
 
 export default function Container({

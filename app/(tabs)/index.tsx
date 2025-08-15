@@ -1,28 +1,21 @@
-import { StyleSheet } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import { StyleSheet } from "react-native";
+import React from "react";
+import { Card, Text, View } from "@/components/Themed";
+import Container from "@/components/Container";
 
-export default function TabOneScreen() {
+const LaunchesScreen = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-    </View>
+    <Container variant="ghost">
+      <View>
+        <Card type="primary" variant="strip">
+          <Text textSize="h4" variant="secondary">Hello</Text>
+          <Text textSize="h6" variant="alt">Hello World</Text>
+        </Card>
+      </View>
+    </Container>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
+export default LaunchesScreen;
+
+const styles = StyleSheet.create({});

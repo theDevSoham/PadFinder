@@ -2,8 +2,21 @@ import { Image, StyleSheet } from "react-native";
 import { View, Text, Button } from "@/components/Themed";
 import React from "react";
 import Container from "@/components/Container";
+import useSpaceXStorage from "@/store/spaceXStore";
+import { useShallow } from "zustand/react/shallow";
+import { useRouter } from "expo-router";
 
 const WelcomeScreen = () => {
+  const toggleFirstTime = useSpaceXStorage(
+    useShallow((state) => state.toggleFirstTime)
+  );
+  const router = useRouter();
+
+  const getStarted = () => {
+    toggleFirstTime();
+    router.replace("/(tabs)");
+  };
+
   return (
     <Container variant="primary">
       <View style={styles.container}>
@@ -33,6 +46,7 @@ const WelcomeScreen = () => {
             variant="secondary"
             title="Get Started"
             style={{ width: "100%" }}
+            onPress={getStarted}
           />
         </View>
       </View>

@@ -9,8 +9,14 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { useColorScheme } from "@/components/useColorScheme";
+import { LoaderOverlay } from "@/components/Loader/LoaderOverlay";
+import { StatusBar } from "expo-status-bar";
+import { Platform, StyleSheet, View } from "react-native";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -51,9 +57,21 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
+  const theme = useColorScheme() ?? "light";
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <LoaderOverlay />
+      {Platform.OS === "android" && (
+        <View
+          style={[
+            styles.statusBarBackground,
+            { height: insets.top, backgroundColor: "#f1733e" },
+          ]}
+        />
+      )}
+      <StatusBar style={theme === "dark" ? "light" : "dark"} translucent />
       <SafeAreaView style={{ flex: 1 }}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -63,3 +81,13 @@ function RootLayoutNav() {
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  statusBarBackground: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 999,
+  },
+});

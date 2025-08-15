@@ -7,6 +7,7 @@ import Colors from "@/constants/Colors";
 import { useColorScheme } from "./useColorScheme";
 import { useVariantStore } from "@/store/variantStore";
 import ThemedButton from "./ThemedButton";
+import ThemedCard from "./ThemedCard";
 
 type ThemeProps = {
   lightColor?: string;
@@ -122,3 +123,4 @@ export function View(props: ViewProps) {
 }
 
 export const Button = ThemedButton;
+export const Card = ThemedCard;
