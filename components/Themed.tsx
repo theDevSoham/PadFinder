@@ -2,6 +2,8 @@ import {
   Text as DefaultText,
   View as DefaultView,
   TextStyle,
+  TextInput as DefaultTextInput,
+  TextInputProps as RNTextInputProps,
 } from "react-native";
 import Colors from "@/constants/Colors";
 import { useColorScheme } from "./useColorScheme";
@@ -32,6 +34,15 @@ export type TextProps = ThemeProps &
 
 export type ViewProps = ThemeProps & DefaultView["props"];
 
+export type ThemedInputProps = ThemeProps &
+  RNTextInputProps & {
+    borderColorVariant?: keyof typeof Colors.light.scheme_colors | "default";
+    borderWidth?: number;
+    borderRadius?: number;
+    paddingHorizontal?: number;
+    paddingVertical?: number;
+  };
+
 // Preset heading sizes
 const headingSizes: Record<HeadingSizes, number> = {
   h1: 32,
@@ -56,7 +67,7 @@ export function useThemeColor(
 
   // Handle "default" variant explicitly
   if (variant === "default") {
-    return Colors[theme].text;
+    return Colors[theme][colorName];
   }
 
   // Handle scheme colors
@@ -120,6 +131,57 @@ export function View(props: ViewProps) {
   ) as string;
 
   return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+}
+
+export function Input({
+  style,
+  lightColor,
+  darkColor,
+  variant = "default",
+  borderColorVariant = "default",
+  borderWidth = 1,
+  borderRadius = 8,
+  paddingHorizontal = 12,
+  paddingVertical = 10,
+  placeholderTextColor,
+  ...otherProps
+}: ThemedInputProps) {
+  const backgroundColor = useThemeColor(
+    { light: lightColor, dark: darkColor, variant },
+    "background"
+  ) as string;
+
+  const textColor = useThemeColor(
+    { light: lightColor, dark: darkColor, variant },
+    "text"
+  ) as string;
+
+  const borderColor = useThemeColor(
+    { variant: borderColorVariant },
+    "text"
+  ) as string;
+
+  const placeholderColor =
+    placeholderTextColor || (useColorScheme() === "dark" ? "#aaa" : "#666");
+
+  return (
+    <DefaultTextInput
+      style={[
+        {
+          backgroundColor,
+          color: textColor,
+          borderColor,
+          borderWidth,
+          borderRadius,
+          paddingHorizontal,
+          paddingVertical,
+        },
+        style,
+      ]}
+      placeholderTextColor={placeholderColor}
+      {...otherProps}
+    />
+  );
 }
 
 export const Button = ThemedButton;

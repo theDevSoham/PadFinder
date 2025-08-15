@@ -5,11 +5,18 @@ import {
   ActivityIndicator,
   Dimensions,
   RefreshControl,
+  useColorScheme,
 } from "react-native";
-import { Card, Text, View } from "@/components/Themed";
+import { Picker } from "@react-native-picker/picker";
+import { Card, Input, Text, View } from "@/components/Themed";
 import Container from "@/components/Container";
 import LaunchService from "@/services/LaunchesService";
 import { Launch, LaunchQueryResponse } from "@/types/LaunchServiceTypes";
+import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+import EmptyState from "@/components/EmptyList";
+
+dayjs.extend(advancedFormat);
 
 const { height: screenHeight } = Dimensions.get("screen");
 
@@ -26,17 +33,25 @@ const LaunchesScreen = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const [searchText, setSearchText] = useState("");
+  const [sortOrder, setSortOrder] = useState<1 | -1>(1); // 1 = oldest first, -1 = newest first
+
   const fetchLaunches = useCallback(
     async (reset = false) => {
       if (loading) return;
 
       setLoading(true);
       try {
+        const query: Record<string, any> = {};
+        if (searchText.trim()) {
+          query.name = { $regex: searchText.trim(), $options: "i" };
+        }
+
         const data: LaunchQueryResponse<LaunchList> =
           await LaunchService.queryLaunches<LaunchList>({
-            query: {},
+            query,
             options: {
-              sort: { date_utc: 1 },
+              sort: { date_utc: sortOrder },
               limit: PAGE_LIMIT,
               page: reset ? 1 : page,
               select: {
@@ -52,7 +67,13 @@ const LaunchesScreen = () => {
         if (reset) {
           setLaunches(data.docs);
         } else {
-          setLaunches((prev) => [...prev, ...data.docs]);
+          setLaunches((prev) => {
+            const updatedMap = new Map(prev.map((item) => [item.id, item]));
+            data.docs.forEach((doc) => {
+              updatedMap.set(doc.id, doc); // replace or add
+            });
+            return Array.from(updatedMap.values());
+          });
         }
 
         setHasNextPage(data.hasNextPage);
@@ -63,8 +84,18 @@ const LaunchesScreen = () => {
         if (reset) setRefreshing(false);
       }
     },
-    [page, loading]
+    [page, loading, searchText, sortOrder]
   );
+
+  useEffect(() => {
+    if (searchText.length === 0) {
+      setPage(1); // Always start fresh when search or sort changes
+      setHasNextPage(true); // Reset pagination
+      fetchLaunches(true);
+    } else {
+      fetchLaunches(true);
+    }
+  }, [searchText, sortOrder]);
 
   useEffect(() => {
     fetchLaunches();
@@ -88,14 +119,18 @@ const LaunchesScreen = () => {
       title={<></>}
       type="primary"
       variant="standard"
-      image={{ uri: item.links.patch.small || "" }}
+      image={
+        item.links.patch.small
+          ? { uri: item.links.patch.small || "" }
+          : require("@/assets/images/no-image.png")
+      }
       imageResize="contain"
     >
-      <Text textSize="h3" variant="secondary">
+      <Text textSize="h2" variant="secondary">
         {item.name}
       </Text>
-      <Text textSize="h6" variant="default">
-        {new Date(item.date_utc).toLocaleDateString()}
+      <Text textSize="h4" variant="default">
+        {dayjs(item.date_utc).format("Do MMMM YYYY [at] h:mm a")}
       </Text>
       <Text textSize="h6" variant="default" numberOfLines={3}>
         {item.details || "No details available"}
@@ -112,36 +147,84 @@ const LaunchesScreen = () => {
       >
         SpaceX Launches history
       </Text>
-      <FlatList
-        data={launches}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={["#00416d"]} // Android indicator color
-            tintColor="#00416d" // iOS indicator color
-          />
-        }
-        ListFooterComponent={
-          loading && !refreshing ? (
-            <View
-              style={{
-                width: "100%",
-                height: screenHeight - 40,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <ActivityIndicator size="large" style={{ margin: 16 }} />
-            </View>
-          ) : null
-        }
+
+      {/* Search Bar */}
+      <Input
+        placeholder="Search by name..."
+        value={searchText}
+        onChangeText={setSearchText}
+        style={styles.searchInput}
       />
+
+      {/* Sort Dropdown */}
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={sortOrder}
+          onValueChange={(value) => setSortOrder(value)}
+          style={styles.picker}
+        >
+          <Picker.Item label="Oldest First" value={1} />
+          <Picker.Item label="Newest First" value={-1} />
+        </Picker>
+      </View>
+
+      {!loading && launches.length === 0 ? (
+        searchText.trim().length > 0 ? (
+          <EmptyState
+            title="No search results"
+            description={`No launches found for "${searchText}"`}
+            image={require("@/assets/images/no-results.png")}
+            onRetry={() => {
+              setSearchText("");
+              setPage(1);
+              fetchLaunches(true);
+            }}
+          />
+        ) : (
+          <EmptyState
+            title="No launches available"
+            description="Looks like there are no SpaceX launches in our records."
+            image={require("@/assets/images/no-results.png")}
+            onRetry={() => {
+              setPage(1);
+              fetchLaunches(true);
+            }}
+          />
+        )
+      ) : (
+        <>
+          <FlatList
+            data={launches}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            contentContainerStyle={styles.listContent}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={["#00416d"]}
+                tintColor="#00416d"
+              />
+            }
+            ListFooterComponent={
+              loading && !refreshing ? (
+                <View
+                  style={{
+                    width: "100%",
+                    height: screenHeight - 40,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <ActivityIndicator size="large" style={{ margin: 16 }} />
+                </View>
+              ) : null
+            }
+          />
+        </>
+      )}
     </Container>
   );
 };
@@ -151,5 +234,26 @@ export default LaunchesScreen;
 const styles = StyleSheet.create({
   listContent: {
     padding: 16,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 25,
+    backgroundColor: "transparent",
+    height: 60,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    overflow: "hidden",
+    marginBottom: 10,
+  },
+  picker: {
+    height: 60,
+    width: "100%",
   },
 });
