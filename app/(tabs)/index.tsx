@@ -4,6 +4,7 @@ import {
   FlatList,
   ActivityIndicator,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import { Card, Text, View } from "@/components/Themed";
 import Container from "@/components/Container";
@@ -23,50 +24,62 @@ const LaunchesScreen = () => {
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchLaunches = useCallback(async () => {
-    if (loading || !hasNextPage) return;
+  const fetchLaunches = useCallback(
+    async (reset = false) => {
+      if (loading) return;
 
-    setLoading(true);
-    try {
-      const data: LaunchQueryResponse<LaunchList> =
-        await LaunchService.queryLaunches<LaunchList>({
-          query: {}, // Empty query fetches all
-          options: {
-            sort: { date_utc: 1 }, // oldest first
-            limit: PAGE_LIMIT,
-            page,
-            select: {
-              id: 1,
-              name: 1,
-              date_utc: 1,
-              links: 1,
-              details: 1,
+      setLoading(true);
+      try {
+        const data: LaunchQueryResponse<LaunchList> =
+          await LaunchService.queryLaunches<LaunchList>({
+            query: {},
+            options: {
+              sort: { date_utc: 1 },
+              limit: PAGE_LIMIT,
+              page: reset ? 1 : page,
+              select: {
+                id: 1,
+                name: 1,
+                date_utc: 1,
+                links: 1,
+                details: 1,
+              },
             },
-          },
-        });
+          });
 
-      setLaunches((prev) => [...prev, ...data.docs]);
-      setHasNextPage(data.hasNextPage);
-    } catch (err) {
-      console.error("Failed to fetch launches:", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, hasNextPage, loading]);
+        if (reset) {
+          setLaunches(data.docs);
+        } else {
+          setLaunches((prev) => [...prev, ...data.docs]);
+        }
+
+        setHasNextPage(data.hasNextPage);
+      } catch (err) {
+        console.error("Failed to fetch launches:", err);
+      } finally {
+        setLoading(false);
+        if (reset) setRefreshing(false);
+      }
+    },
+    [page, loading]
+  );
 
   useEffect(() => {
     fetchLaunches();
   }, [page]);
 
-  useEffect(() => {
-    console.log(launches[0]);
-  }, [launches]);
-
   const loadMore = () => {
     if (hasNextPage && !loading) {
       setPage((prev) => prev + 1);
     }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    setPage(1);
+    fetchLaunches(true);
   };
 
   const renderItem = ({ item }: { item: LaunchList }) => (
@@ -106,8 +119,16 @@ const LaunchesScreen = () => {
         contentContainerStyle={styles.listContent}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#00416d"]} // Android indicator color
+            tintColor="#00416d" // iOS indicator color
+          />
+        }
         ListFooterComponent={
-          loading ? (
+          loading && !refreshing ? (
             <View
               style={{
                 width: "100%",
