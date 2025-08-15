@@ -1,7 +1,8 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import {
   Image,
   ImageSourcePropType,
+  ImageURISource,
   StyleProp,
   StyleSheet,
   TextStyle,
@@ -25,6 +26,7 @@ type ThemedCardProps = {
   type?: CardType; // now directly maps to variant
   variant?: CardVariant;
   image?: ImageSourcePropType;
+  imageResize?: "contain" | "cover";
   imagePosition?: ImagePosition;
   containerStyle?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
@@ -38,6 +40,7 @@ const ThemedCard = ({
   type = "default",
   variant = "standard",
   image,
+  imageResize = "cover",
   imagePosition = "left",
   containerStyle,
   textStyle,
@@ -78,6 +81,15 @@ const ThemedCard = ({
     );
   };
 
+  useEffect(() => {
+    if (image && (image as ImageURISource).uri) {
+      const uri = (image as ImageURISource).uri!;
+      Image.prefetch(uri)
+        .then((success) => console.log("Image valid: ", success))
+        .catch((e) => console.log("Image invalid: ", e));
+    }
+  }, [image]);
+
   switch (variant) {
     case "strip":
       return (
@@ -94,7 +106,7 @@ const ThemedCard = ({
             <Image
               source={image}
               style={styles.stripImage}
-              resizeMode="cover"
+              resizeMode={imageResize}
             />
           )}
           <View style={styles.stripTextContainer}>
@@ -112,7 +124,11 @@ const ThemedCard = ({
           {...wrapperProps}
         >
           {image && (
-            <Image source={image} style={styles.image} resizeMode="cover" />
+            <Image
+              source={image}
+              style={styles.image}
+              resizeMode={imageResize}
+            />
           )}
           {renderTitle()}
           <View style={styles.body}>{children}</View>
