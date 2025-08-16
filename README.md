@@ -145,7 +145,7 @@ Here’s a high-level structure of the project:
 
 ## 🖼 Screenshots   
 
-- ![Welcome Screen](assets/screenshots/launch-list.png)  
+- ![Welcome Screen]<img width="900" height="1600" alt="image" src="https://github.com/user-attachments/assets/2aec57d8-8e42-48c7-920b-6a678269e250" />
 - ![Launches List](assets/screenshots/launch-list.png)  
 - ![Launch Details](assets/screenshots/launch-details.png)  
 - ![Launchpad Screen](assets/screenshots/launchpad.png)  
