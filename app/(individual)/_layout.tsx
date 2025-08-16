@@ -8,9 +8,9 @@ export default function FirstTimeLayout() {
 
   switch (isFirstTime) {
     case "first_time":
-      return <Slot />;
+      return <Redirect href="/(first_time)" />;
     case "individual":
-      return <Redirect href="/(individual)/launchDetails" />;
+      return <Slot />;
     case "not_first":
       return <Redirect href="/(tabs)" />;
   }

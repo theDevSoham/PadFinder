@@ -15,6 +15,8 @@ import { Launch, LaunchQueryResponse } from "@/types/LaunchServiceTypes";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import EmptyState from "@/components/EmptyList";
+import { useRouter } from "expo-router";
+import useSpaceXStorage from "@/store/spaceXStore";
 
 dayjs.extend(advancedFormat);
 
@@ -33,8 +35,12 @@ const LaunchesScreen = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const toggleFirstTime = useSpaceXStorage((state) => state.toggleFirstTime);
+
   const [searchText, setSearchText] = useState("");
   const [sortOrder, setSortOrder] = useState<1 | -1>(1); // 1 = oldest first, -1 = newest first
+
+  const router = useRouter();
 
   const fetchLaunches = useCallback(
     async (reset = false) => {
@@ -125,6 +131,15 @@ const LaunchesScreen = () => {
           : require("@/assets/images/no-image.png")
       }
       imageResize="contain"
+      onPress={() => {
+        toggleFirstTime("individual");
+        router.replace({
+          pathname: "/(individual)/launchDetails",
+          params: {
+            launchId: item.id,
+          },
+        });
+      }}
     >
       <Text textSize="h2" variant="secondary">
         {item.name}

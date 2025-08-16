@@ -3,17 +3,16 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { spaceXStorage } from "./mmkv";
 
 export interface ISpaceXStore {
-  isFirstTime: boolean;
-  toggleFirstTime: () => void;
+  isFirstTime: "first_time" | "not_first" | "individual";
+  toggleFirstTime: (current: "first_time" | "not_first" | "individual") => void;
 }
 // store/exampleStore.ts
 
 const useSpaceXStorage = create<ISpaceXStore>()(
   persist(
     (set, get) => ({
-      isFirstTime: true,
-      toggleFirstTime: () =>
-        set((state) => ({ isFirstTime: !state.isFirstTime })),
+      isFirstTime: "first_time",
+      toggleFirstTime: (current) => set((state) => ({ isFirstTime: current })),
     }),
     {
       name: "space-x-storage",

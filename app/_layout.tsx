@@ -76,6 +76,7 @@ function RootLayoutNav() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="(first_time)" options={{ headerShown: false }} />
+          <Stack.Screen name="(individual)" options={{ headerShown: false }} />
         </Stack>
       </SafeAreaView>
     </ThemeProvider>

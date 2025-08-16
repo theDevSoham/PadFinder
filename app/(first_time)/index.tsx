@@ -13,7 +13,7 @@ const WelcomeScreen = () => {
   const router = useRouter();
 
   const getStarted = () => {
-    toggleFirstTime();
+    toggleFirstTime("not_first");
     router.replace("/(tabs)");
   };
 
