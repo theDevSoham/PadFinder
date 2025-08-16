@@ -84,9 +84,7 @@ const ThemedCard = ({
   useEffect(() => {
     if (image && (image as ImageURISource).uri) {
       const uri = (image as ImageURISource).uri!;
-      Image.prefetch(uri)
-        .then((success) => console.log("Image valid: ", success))
-        .catch((e) => console.log("Image invalid: ", e));
+      Image.prefetch(uri).catch((e) => console.log("Image invalid: ", e));
     }
   }, [image]);
 

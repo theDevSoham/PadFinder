@@ -66,6 +66,15 @@ export default function TabLayout() {
               ),
             }}
           />
+          <Tabs.Screen
+            name="logViewer"
+            options={{
+              title: "App Logs Viewer",
+              tabBarIcon: ({ color }) => (
+                <TabBarIcon name="lightbulb-o" color={color} />
+              ),
+            }}
+          />
         </Tabs>
       );
   }

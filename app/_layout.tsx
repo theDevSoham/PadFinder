@@ -1,3 +1,4 @@
+import { setupLogger } from "@/utils/logger";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
@@ -17,6 +18,8 @@ import { useColorScheme } from "@/components/useColorScheme";
 import { LoaderOverlay } from "@/components/Loader/LoaderOverlay";
 import { StatusBar } from "expo-status-bar";
 import { Platform, StyleSheet, View } from "react-native";
+
+setupLogger(); // call at the very top before app code
 
 export {
   // Catch any errors thrown by the Layout component.
