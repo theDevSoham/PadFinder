@@ -1,4 +1,4 @@
-# 🚀 PadFinder  
+# <img width="100" height="100" alt="adaptive-icon (1)" src="https://github.com/user-attachments/assets/ee108a2c-39bd-480e-a058-a9ab3e4dc905" /> PadFinder  
 
 **PadFinder** is a mobile app built with **Expo** and **React Native** that allows users to explore SpaceX launches, view launch details, explore launchpads, and manage their favourite missions. It provides a themed UI, offline storage for favourites, and smooth navigation using **Expo Router**.  
 
