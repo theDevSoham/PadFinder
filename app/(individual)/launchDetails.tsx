@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Alert,
   Dimensions,
+  TouchableOpacity,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { View, Text, Button } from "@/components/Themed";
@@ -14,6 +15,7 @@ import LaunchService from "@/services/LaunchesService";
 import { Launch } from "@/types/LaunchServiceTypes";
 import dayjs from "dayjs";
 import useSpaceXStorage from "@/store/spaceXStore";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -25,6 +27,22 @@ const LaunchDetailsScreen = () => {
   const [loading, setLoading] = useState(true);
 
   const toggleFirstTime = useSpaceXStorage((state) => state.toggleFirstTime);
+
+  const favourites = useSpaceXStorage((state) => state.favourites);
+  const addFavourite = useSpaceXStorage((state) => state.addFavourite);
+  const removeFavourite = useSpaceXStorage((state) => state.removeFavourite);
+
+  // derived boolean from subscribed state
+  const isFav = launch ? favourites.some((f) => f.id === launch.id) : false;
+
+  const toggleFavourite = () => {
+    if (!launch) return;
+    if (isFav) {
+      removeFavourite(launch.id);
+    } else {
+      addFavourite(launch);
+    }
+  };
 
   const fetchLaunchDetails = async () => {
     if (!launchId) {
@@ -100,6 +118,18 @@ const LaunchDetailsScreen = () => {
           style={styles.image}
           resizeMode="contain"
         />
+
+        <TouchableOpacity
+          activeOpacity={0.7}
+          style={styles.favButton}
+          onPress={toggleFavourite}
+        >
+          <Ionicons
+            name={isFav ? "heart" : "heart-outline"}
+            size={28}
+            color={isFav ? "red" : "gray"}
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Scrollable Details */}
@@ -216,5 +246,13 @@ const styles = StyleSheet.create({
   buttonsWrapper: {
     marginTop: 30,
     marginBottom: 50,
+  },
+  favButton: {
+    position: "absolute",
+    top: 10,
+    right: 20,
+    backgroundColor: "transparent",
+    borderRadius: 50,
+    padding: 6,
   },
 });

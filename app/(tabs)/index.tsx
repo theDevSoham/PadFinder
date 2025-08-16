@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   Dimensions,
   RefreshControl,
-  useColorScheme,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { Card, Input, Text, View } from "@/components/Themed";
