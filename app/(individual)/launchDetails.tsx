@@ -29,7 +29,13 @@ const LaunchDetailsScreen = () => {
   const fetchLaunchDetails = async () => {
     if (!launchId) {
       Alert.alert("Invalid Request", "No launch ID provided", [
-        { text: "OK", onPress: () => router.back() },
+        {
+          text: "OK",
+          onPress: () => {
+            toggleFirstTime("not_first");
+            router.replace("/(tabs)");
+          },
+        },
       ]);
       return;
     }
@@ -39,7 +45,13 @@ const LaunchDetailsScreen = () => {
 
       if (!data) {
         Alert.alert("Not Found", "No launch found for the given ID", [
-          { text: "OK", onPress: () => router.back() },
+          {
+            text: "OK",
+            onPress: () => {
+              toggleFirstTime("not_first");
+              router.replace("/(tabs)");
+            },
+          },
         ]);
         return;
       }
@@ -48,7 +60,13 @@ const LaunchDetailsScreen = () => {
     } catch (err) {
       console.error(err);
       Alert.alert("Error", "Failed to fetch launch details", [
-        { text: "OK", onPress: () => router.back() },
+        {
+          text: "OK",
+          onPress: () => {
+            toggleFirstTime("not_first");
+            router.replace("/(tabs)");
+          },
+        },
       ]);
     } finally {
       setLoading(false);
@@ -132,7 +150,7 @@ const LaunchDetailsScreen = () => {
             variant="secondary"
             onPress={() =>
               router.push({
-                pathname: "/launchpad",
+                pathname: "/(individual)/launchpad",
                 params: { id: launch.launchpad },
               })
             }
