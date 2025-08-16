@@ -16,6 +16,66 @@
 
 ---
 
+## App Logging System
+
+### 1. Logger Implementation (Current)
+
+- The app currently implements a custom in-app logging system using a persistent, rotated log storage:
+
+- Logger Location: logger.ts
+
+- Storage: react-native-mmkv (fast, persistent key-value storage)
+
+- Console Override: All console.log, console.warn, and console.error calls are redirected to the logger.
+
+- In-Memory Rotation: Keeps only the latest 500 logs in memory for efficiency.
+
+- Persistence: Logs are saved in MMKV and survive app restarts.
+
+- Log Viewer: LogViewer.tsx screen displays logs with timestamps, color-coded levels, and a “Clear” button.
+
+### Why this approach for now:
+
+- No backend required: Logs are stored and viewable directly in the app.
+
+- Cost-efficient: Avoids running external services while still retaining visibility.
+
+- Easy integration path: Sets up a uniform structure for logging, which will simplify sending logs to external systems like Grafana Cloud, Loki, or other visualization tools in the future.
+
+### 2. Future Endeavors (Integration with External Loggers)
+
+- Planned improvements and integrations:
+
+- Grafana Cloud / Loki Integration
+
+- Replace in-app MMKV persistence with a network logger.
+
+- Send logs from the app directly to a Grafana Loki instance via HTTP or WebSocket.
+
+- Use log levels (info, warn, error) for filtering in dashboards.
+
+- Centralized Logging
+
+- Aggregate logs from multiple app instances for analytics and debugging.
+
+- Include device info, session identifiers, and user context in logs.
+
+- Cost & Performance Optimizations
+
+- Implement batching or throttling for network log uploads.
+
+- Optionally store logs temporarily in MMKV if offline, then sync when online.
+
+- Enhanced Log Viewer
+
+- Real-time live updates with WebSocket subscription.
+
+- Search, filter, and export logs for easier debugging.
+
+#### Goal: Maintain a developer-friendly, cost-efficient, and scalable logging system, with the flexibility to integrate advanced logging and visualization tools as the app grows.
+
+---
+
 ## ⚙️ Local Setup  
 
 1. Clone the repo:  
@@ -94,53 +154,54 @@ Here’s a high-level structure of the project:
 │   ├── fonts/
 │   │   └── SpaceMono-Regular.ttf
 │   └── images/
-│       ├── adaptive-icon.png    # App adaptive icon
-│       ├── favicon.png          # Favicon for web build
-│       ├── icon.png             # App icon
-│       ├── no-image.png         # Default placeholder image for launches
-│       ├── no-results.png       # Image shown for empty search results
-│       ├── splash-icon.png      # Splash screen icon
-│       └── welcome.png          # Onboarding / welcome illustration
+│       ├── adaptive-icon.png
+│       ├── favicon.png
+│       ├── icon.png
+│       ├── no-image.png
+│       ├── no-results.png
+│       ├── splash-icon.png
+│       └── welcome.png
 │
 ├── components/                  # Shared reusable UI components
-│   ├── Loader/                  # Loading indicators & overlays
+│   ├── Loader/
 │   │   ├── LoaderOverlay.tsx
 │   │   └── ...
-│   ├── Container.tsx            # Page container with theming
-│   ├── EmptyList.tsx            # Empty state component for lists
-│   ├── ExternalLink.tsx         # Opens external links safely
-│   ├── StyledText.tsx           # Styled text wrapper
-│   ├── Themed.tsx               # Themed View & Text components
-│   ├── ThemedButton.tsx         # Themed button component
-│   └── ThemedCard.tsx           # Themed card component
+│   ├── Container.tsx
+│   ├── EmptyList.tsx
+│   ├── ExternalLink.tsx
+│   ├── StyledText.tsx
+│   ├── Themed.tsx
+│   ├── ThemedButton.tsx
+│   └── ThemedCard.tsx
 │
 ├── constants/                   # App-wide constant values
-│   └── Colors.ts                # Theme colors & palette
+│   └── Colors.ts
 │
 ├── services/                    # API service layer
-│   ├── constants.ts             # API constants (base URLs, etc.)
-│   ├── LaunchesService.ts       # Fetch launches data from SpaceX API
-│   └── LaunchpadService.ts      # Fetch launchpad data from SpaceX API
+│   ├── constants.ts
+│   ├── LaunchesService.ts
+│   └── LaunchpadService.ts
 │
 ├── store/                       # Global state management (MMKV + Zustand)
-│   ├── exampleStore.ts          # Example store (template)
-│   ├── loaderStore.ts           # Store for loader overlay state
-│   ├── mmkv.ts                  # MMKV storage initialization
-│   ├── spaceXStore.ts           # Store for favourites & first-time logic
-│   └── variantStore.ts          # Store for theme variants
+│   ├── exampleStore.ts
+│   ├── loaderStore.ts
+│   ├── mmkv.ts
+│   ├── spaceXStore.ts
+│   └── variantStore.ts
 │
 ├── types/                       # TypeScript types for services & data
-│   ├── LaunchpadServiceTypes.ts # Types for launchpad data
-│   └── LaunchServiceTypes.ts    # Types for launches data
+│   ├── LaunchpadServiceTypes.ts
+│   └── LaunchServiceTypes.ts
+│
+├── utils/                       # Utility functions
+│   └── logger.ts                # Custom in-app logger with MMKV persistence
 │
 ├── app.json                     # Expo app configuration
 ├── expo-env.d.ts                # Expo type declarations
 ├── package.json                 # Project dependencies & scripts
 ├── package-lock.json            # Dependency lockfile
 └── tsconfig.json                # TypeScript configuration
-
 ```
-
 ---
 
 ## 🖼 Screenshots   
