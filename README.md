@@ -69,44 +69,76 @@ Please follow the existing **code style** (Themed components, Zustand for state,
 
 Here’s a high-level structure of the project:
 
-```mermaid
-%%{init: {'theme':'default'}}%%
-graph TD
-  A[app] --> B((first_time))
-  A --> C((individual))
-  A --> D((tabs))
-  A --> E[_layout.tsx]
-  A --> F[+not-found.tsx]
+```
+.
+├── app/                         # All screens & navigation routes
+│   ├── (first_time)/            # Screens shown only during the first launch
+│   │   ├── _layout.tsx          # Layout wrapper for first-time screens
+│   │   └── index.tsx            # Welcome / onboarding screen
+│   │
+│   ├── (individual)/            # Individual launch or launchpad detail screens
+│   │   ├── _layout.tsx          # Layout wrapper for individual screens
+│   │   ├── launchDetails.tsx    # Launch details screen (with favourites)
+│   │   └── launchpad.tsx        # Launchpad details screen (with map + distance)
+│   │
+│   ├── (tabs)/                  # Main tab navigation screens
+│   │   ├── _layout.tsx          # Tab layout (navigation between tabs)
+│   │   ├── favourite.tsx        # User’s favourite launches list
+│   │   └── index.tsx            # Main launches list with search & filters
+│   │
+│   ├── _layout.tsx              # Root layout for the entire app
+│   ├── +html.tsx                # HTML document customization
+│   └── +not-found.tsx           # 404-like not found screen
+│
+├── assets/                      # Static assets (images, fonts, icons)
+│   ├── fonts/
+│   │   └── SpaceMono-Regular.ttf
+│   └── images/
+│       ├── adaptive-icon.png    # App adaptive icon
+│       ├── favicon.png          # Favicon for web build
+│       ├── icon.png             # App icon
+│       ├── no-image.png         # Default placeholder image for launches
+│       ├── no-results.png       # Image shown for empty search results
+│       ├── splash-icon.png      # Splash screen icon
+│       └── welcome.png          # Onboarding / welcome illustration
+│
+├── components/                  # Shared reusable UI components
+│   ├── Loader/                  # Loading indicators & overlays
+│   │   ├── LoaderOverlay.tsx
+│   │   └── ...
+│   ├── Container.tsx            # Page container with theming
+│   ├── EmptyList.tsx            # Empty state component for lists
+│   ├── ExternalLink.tsx         # Opens external links safely
+│   ├── StyledText.tsx           # Styled text wrapper
+│   ├── Themed.tsx               # Themed View & Text components
+│   ├── ThemedButton.tsx         # Themed button component
+│   └── ThemedCard.tsx           # Themed card component
+│
+├── constants/                   # App-wide constant values
+│   └── Colors.ts                # Theme colors & palette
+│
+├── services/                    # API service layer
+│   ├── constants.ts             # API constants (base URLs, etc.)
+│   ├── LaunchesService.ts       # Fetch launches data from SpaceX API
+│   └── LaunchpadService.ts      # Fetch launchpad data from SpaceX API
+│
+├── store/                       # Global state management (MMKV + Zustand)
+│   ├── exampleStore.ts          # Example store (template)
+│   ├── loaderStore.ts           # Store for loader overlay state
+│   ├── mmkv.ts                  # MMKV storage initialization
+│   ├── spaceXStore.ts           # Store for favourites & first-time logic
+│   └── variantStore.ts          # Store for theme variants
+│
+├── types/                       # TypeScript types for services & data
+│   ├── LaunchpadServiceTypes.ts # Types for launchpad data
+│   └── LaunchServiceTypes.ts    # Types for launches data
+│
+├── app.json                     # Expo app configuration
+├── expo-env.d.ts                # Expo type declarations
+├── package.json                 # Project dependencies & scripts
+├── package-lock.json            # Dependency lockfile
+└── tsconfig.json                # TypeScript configuration
 
-  B --> B1[_layout.tsx]
-  B --> B2[index.tsx]
-
-  C --> C1[_layout.tsx]
-  C --> C2[launchDetails.tsx]
-  C --> C3[launchpad.tsx]
-
-  D --> D1[_layout.tsx]
-  D --> D2[favourite.tsx]
-  D --> D3[index.tsx]
-
-  G[assets] --> G1[fonts]
-  G --> G2[images]
-
-  H[components] --> H1[Loader]
-  H --> H2[Themed]
-  H --> H3[ThemedButton]
-  H --> H4[ThemedCard]
-
-  I[constants] --> I1[Colors.ts]
-
-  J[services] --> J1[LaunchService.ts]
-  J --> J2[LaunchpadService.ts]
-
-  K[store] --> K1[spaceXStore.ts]
-  K --> K2[variantStore.ts]
-
-  L[types] --> L1[LaunchServiceTypes.ts]
-  L --> L2[LaunchpadServiceTypes.ts]
 ```
 
 ---
