@@ -145,12 +145,18 @@ Here’s a high-level structure of the project:
 
 ## 🖼 Screenshots   
 
-- ![Welcome Screen]<img width="900" height="1600" alt="image" src="https://github.com/user-attachments/assets/2aec57d8-8e42-48c7-920b-6a678269e250" />
-- ![Launches List](assets/screenshots/launch-list.png)  
-- ![Launch Details](assets/screenshots/launch-details.png)  
-- ![Launchpad Screen](assets/screenshots/launchpad.png)  
-- ![Favourites](assets/screenshots/favourites.png)  
-
+- ### Welcome Screen
+  <img width="320" height="750" alt="image" src="https://github.com/user-attachments/assets/2aec57d8-8e42-48c7-920b-6a678269e250" />
+- ### Launches List
+  <img width="320" height="750" alt="image" src="https://github.com/user-attachments/assets/d11b2927-eeea-420b-bfc6-147efb345aa2" />
+- ### Launch Details
+  <img width="320" height="750" alt="image" src="https://github.com/user-attachments/assets/3ba6b470-6415-4362-adec-d069ad2b9cfb" />
+- ### Launchpad Screen
+  <img width="320" height="750" alt="image" src="https://github.com/user-attachments/assets/c8d1ae51-6843-4284-8b3c-d66b81aad578" />
+- ### Favourites Empty
+  <img width="320" height="750" alt="image" src="https://github.com/user-attachments/assets/1f15e0b7-5cd4-4092-95d8-8d75c03d5ec8" />
+- ### Favourites
+  <img width="320" height="750" alt="image" src="https://github.com/user-attachments/assets/4ad39b2d-b083-4694-ab9c-5ddae9ad56b1" />
 ---
 
 ## 🏁 Conclusion  
