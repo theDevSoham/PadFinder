@@ -11,20 +11,17 @@ import { Card, Input, Text, View } from "@/components/Themed";
 import Container from "@/components/Container";
 import LaunchService from "@/services/LaunchesService";
 import { Launch, LaunchQueryResponse } from "@/types/LaunchServiceTypes";
-import dayjs from "dayjs";
-import advancedFormat from "dayjs/plugin/advancedFormat";
 import EmptyState from "@/components/EmptyList";
 import { useRouter } from "expo-router";
 import useSpaceXStorage from "@/store/spaceXStore";
-
-dayjs.extend(advancedFormat);
+import { formatLaunchDate } from "@/utils/formatDate";
 
 const { height: screenHeight } = Dimensions.get("screen");
 
 const PAGE_LIMIT = 10;
 type LaunchList = Pick<
   Launch,
-  "id" | "name" | "date_utc" | "links" | "details"
+  "id" | "name" | "date_utc" | "links" | "details" | "date_precision"
 >;
 
 const LaunchesScreen = () => {
@@ -63,6 +60,7 @@ const LaunchesScreen = () => {
                 id: 1,
                 name: 1,
                 date_utc: 1,
+                date_precision: 1,
                 links: 1,
                 details: 1,
               },
@@ -144,7 +142,7 @@ const LaunchesScreen = () => {
         {item.name}
       </Text>
       <Text textSize="h4" variant="default">
-        {dayjs(item.date_utc).format("Do MMMM YYYY [at] h:mm a")}
+        {formatLaunchDate(item.date_utc, item.date_precision)}
       </Text>
       <Text textSize="h6" variant="default" numberOfLines={3}>
         {item.details || "No details available"}

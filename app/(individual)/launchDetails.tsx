@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   StyleSheet,
   Image,
@@ -14,17 +14,26 @@ import Container from "@/components/Container";
 import LaunchService from "@/services/LaunchesService";
 import { Launch } from "@/types/LaunchServiceTypes";
 import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import useSpaceXStorage from "@/store/spaceXStore";
 import { Ionicons } from "@expo/vector-icons";
+import { formatLaunchDate } from "@/utils/formatDate";
 
 const { width: screenWidth } = Dimensions.get("window");
+
+dayjs.extend(duration);
 
 const LaunchDetailsScreen = () => {
   const { launchId } = useLocalSearchParams<{ launchId?: string }>();
   const router = useRouter();
 
+  const isLaunched = useRef(false);
+
   const [launch, setLaunch] = useState<Launch | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dateTimeDifference, setDateTimeDifference] = useState<string | null>(
+    null
+  );
 
   const toggleFirstTime = useSpaceXStorage((state) => state.toggleFirstTime);
 
@@ -95,6 +104,54 @@ const LaunchDetailsScreen = () => {
     fetchLaunchDetails();
   }, [launchId]);
 
+  useEffect(() => {
+    if (!launch || !launch.date_utc || isLaunched.current) return;
+
+    if (!launch.upcoming) {
+      isLaunched.current = true;
+      setDateTimeDifference("Rocket already launched");
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (launch?.date_utc) {
+        const diff = dayjs(launch.date_utc).diff(dayjs(), "second");
+        const dur = dayjs.duration(diff, "seconds");
+
+        const parts = [];
+
+        if (dur.years() > 0) parts.push(`${dur.years()}y`);
+        if (dur.months() > 0) parts.push(`${dur.months()}mo`);
+        if (dur.days() > 0) parts.push(`${dur.days()}d`);
+        if (dur.hours() > 0) parts.push(`${dur.hours()}h`);
+        if (dur.minutes() > 0) parts.push(`${dur.minutes()}m`);
+        if (dur.seconds() > 0) parts.push(`${dur.seconds()}s`);
+
+        const joined = parts.join(" ");
+
+        if (joined.length === 0) {
+          isLaunched.current = true;
+          setDateTimeDifference("Rocket already launched");
+          clearInterval(interval);
+          return;
+        } else {
+          isLaunched.current = false;
+          setDateTimeDifference(joined + "until launch");
+        }
+      }
+    }, 1000);
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [launch]);
+
+  // useEffect(() => {
+  //   console.log("Date Time Difference:", dateTimeDifference);
+  // }, [dateTimeDifference])
+
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -134,11 +191,18 @@ const LaunchDetailsScreen = () => {
 
       {/* Scrollable Details */}
       <ScrollView style={styles.detailsContainer}>
+        {launch.upcoming && (
+          <View>
+            <Text textSize="h4" variant="default" style={styles.date}>
+              {dateTimeDifference}
+            </Text>
+          </View>
+        )}
         <Text textSize="h1" variant="secondary" style={styles.title}>
           {launch.name}
         </Text>
         <Text textSize="h4" variant="default" style={styles.date}>
-          {dayjs(launch.date_utc).format("Do MMMM YYYY [at] h:mm a")}
+          {formatLaunchDate(launch.date_utc, launch.date_precision)}
         </Text>
 
         {launch.details ? (
